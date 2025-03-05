@@ -73,6 +73,26 @@ Audio playback is supported on:
 - macOS (using `afplay`)
 - Linux (using `aplay`)
 
+## MCP Configuration
+
+Add the following configuration to your MCP settings file:
+
+```json
+{
+  "mcpServers": {
+    "kokoro-tts": {
+      "command": "/Users/giannisan/pinokio/bin/miniconda/bin/uv",
+      "args": [
+        "--directory",
+        "/Users/giannisan/Documents/Cline/MCP/kokoro-tts-mcp",
+        "run",
+        "tts-mcp.py"
+      ]
+    }
+  }
+}
+```
+
 ## License
 
 [Add your license information here]
