@@ -29,6 +29,7 @@ uv pip install .
 - Adjustable speech speed
 - Support for saving audio to files or direct playback
 - Cross-platform audio playback support (Windows, macOS, Linux)
+- Optional OpenAI-compatible remote backend (e.g. [kokoro-fastapi](https://github.com/remsky/Kokoro-FastAPI)) to offload synthesis to a GPU box
 
 ## Usage
 
@@ -60,11 +61,41 @@ async with Client() as client:
     )
 ```
 
+## Remote backend (OpenAI-compatible)
+
+By default the server runs Kokoro locally. If you already run an OpenAI-compatible
+TTS endpoint such as [kokoro-fastapi](https://github.com/remsky/Kokoro-FastAPI)
+(handy for running on a GPU), point the server at it with environment variables —
+no local `torch`/`kokoro` needed:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `KOKORO_BASE_URL` | _(unset)_ | OpenAI-compatible base URL, e.g. `http://localhost:8880/v1`. When set, synthesis is sent here instead of running locally. |
+| `KOKORO_API_KEY` | `not-needed` | Bearer token, if your endpoint requires one. |
+| `KOKORO_MODEL` | `kokoro` | Model name passed to the endpoint. |
+
+Under the hood this calls `POST {KOKORO_BASE_URL}/audio/speech` with the standard
+OpenAI payload (`model`, `input`, `voice`, `speed`, `response_format: wav`).
+
+## Docker
+
+```bash
+docker build -t kokoro-tts-mcp .
+docker run --rm -i kokoro-tts-mcp
+```
+
+To use a remote backend instead of bundling Kokoro:
+
+```bash
+docker run --rm -i -e KOKORO_BASE_URL=http://host.docker.internal:8880/v1 kokoro-tts-mcp
+```
+
 ## Dependencies
 
 - kokoro >= 0.8.4
 - mcp[cli] >= 1.3.0
 - soundfile >= 0.13.1
+- httpx >= 0.27.0
 
 ## Platform Support
 
@@ -95,4 +126,4 @@ Add the following configuration to your MCP settings file:
 
 ## License
 
-[Add your license information here]
+[MIT](LICENSE) © Gianni Sanrochman
